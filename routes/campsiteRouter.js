@@ -62,8 +62,9 @@ campsiteRouter
   })
 
   .put((req, res) => {
-    res.statusCode = 403;
-    res.end("Put operation not supported on /campsitesId");
+    res.write(`Updating the campsite: ${req.params.campsiteId}\n`);
+    res.end(`Will update the campsite: ${req.body.name}
+        with description: ${req.body.description}`);
   })
 
   .delete((req, res) => {

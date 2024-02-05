@@ -22,15 +22,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use("/campsites", campsiteRouter);
-app.use("/promotions", promotionRouter);
-app.use("/partners", partnerRouter);
-
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
+app.use("/campsites", campsiteRouter);
+app.use("/promotions", promotionRouter);
+app.use("/partners", partnerRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
