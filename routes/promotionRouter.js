@@ -1,30 +1,37 @@
 //the module will contain the routes for promotions and camsitesId
 
 const express = require("express");
+const promotion = require("../models/promotion");
+const Promotion = require("../models/promotion");
+
 const promotionRouter = express.Router(); // object name promotionRouter to use with express routing methods
 
 promotionRouter
   .route("/")
 
-  // routing method default
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    //this indicate that it will return plain text
-    res.setHeader("Content-Type", "test/plain");
-    next(); // this passes controle to the next routing method
-  })
-
   //set up an end point for the get request
 
-  .get((req, res) => {
-    res.end("Will send all the promotions to you"); //msg sent to the client
+  .get((req, res, next) => {
+    Promotion.find()
+      .then((promotions) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(promotion);
+      })
+      .catch((err) => err);
   })
 
-  .post((req, res) => {
+  .post((req, res, next) => {
+    promotion
+      .create(req.body)
+      .then((promotion) => {
+        console.log("Promotion Created ", promotion);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(promotion);
+      })
+      .catch((err) => next(err));
     //this will be json data
-    res.end(
-      `Will add the promotions:${req.body.name} with description:${req.body.description}`
-    );
   })
 
   .put((req, res) => {
@@ -32,42 +39,55 @@ promotionRouter
     res.end("Put operation not supported on /promotions");
   })
 
-  .delete((req, res) => {
-    res.end("Deleting all promotions");
+  .delete((req, res, next) => {
+    Promotion.deleteMany()
+      .then((response) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(response);
+      })
+      .catch((err) => next(err));
   });
 
 promotionRouter
   .route("/:promotionId")
-
-  // routing method default
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    //this indicate that it will return plain text
-    res.setHeader("Content-Type", "test/plain");
-    next(); // this passes controle to the next routing method
+  .get((req, res, next) => {
+    Promotion.findById(req.params.promotionId)
+      .then((promotion) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(promotion);
+      })
+      .catch((err) => next(err));
   })
-
-  //add support for 4 more end points using a route parameter to the end of path:/promotionId
-
-  .get((req, res) => {
-    res.end(
-      `Will send the details of the promotions: ${req.params.promotionId} to you`
-    );
-  })
-
   .post((req, res) => {
+    res.statusCode = 403;
     res.end(
-      `Will add the partner: ${req.body.name} with description: ${req.body.description}`
+      `POST operation not supported on /campsites/${req.params.promotionId}`
     );
   })
-
-  .put((req, res) => {
-    res.write(`Updating the promotions: ${req.params.promotionId}\n`);
-    res.end(`Will update the promotions: ${req.body.name}
-        with description: ${req.body.description}`);
+  .put((req, res, next) => {
+    Promotion.findByIdAndUpdate(
+      req.params.promotionId,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    )
+      .then((promotion) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(promotion);
+      })
+      .catch((err) => next(err));
   })
-
-  .delete((req, res) => {
-    res.end(`Deleing promotion: ${req.params.promotionId}`);
+  .delete((req, res, next) => {
+    Promotion.findByIdAndDelete(req.params.promotionId)
+      .then((response) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(response);
+      })
+      .catch((err) => next(err));
   });
 module.exports = promotionRouter;
