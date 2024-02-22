@@ -1,6 +1,7 @@
 const express = require("express");
 const authenticate = require("../authenticate");
 const multer = require("multer"); // this is the middleware that is use for file upload
+const cors = require("./cors");
 
 //this is the opt to set the storage insted of using the default
 const storage = multer.diskStorage({
@@ -26,11 +27,18 @@ const uploadRouter = express.Router(); // this the router
 //this to handle the the http request
 uploadRouter
   .route("/")
-  .get(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.statusCode = 403;
-    res.end("GET operation not supported on /imageUpload");
-  })
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.statusCode = 403;
+      res.end("GET operation not supported on /imageUpload");
+    }
+  )
   .post(
+    cors.corsWithOptions,
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     upload.single("imageFile"),
@@ -40,13 +48,23 @@ uploadRouter
       res.json(req.file);
     }
   )
-  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.statusCode = 403;
-    res.end("PUT operation not supported on /imageUpload");
-  })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.statusCode = 403;
-    res.end("DELETE operation not supported on /imageUpload");
-  });
+  .put(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.statusCode = 403;
+      res.end("PUT operation not supported on /imageUpload");
+    }
+  )
+  .delete(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.statusCode = 403;
+      res.end("DELETE operation not supported on /imageUpload");
+    }
+  );
 
 module.exports = uploadRouter; // this will make it avail to other modules
