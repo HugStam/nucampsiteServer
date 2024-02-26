@@ -4,24 +4,18 @@ const Schema = mongoose.Schema;
 require("mongoose-currency").loadType(mongoose);
 const Currency = mongoose.Types.Currency;
 
-const favoriteSchema = new Schema(
-  {
-    users: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    campsites: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Campsite",
-      },
-    ],
+const favoriteSchema = new Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
-
-  {
-    timestamps: true,
-  }
-);
+  campsites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Campsite",
+    },
+  ],
+});
 const Favorite = mongoose.model("Favorite", favoriteSchema);
 
 module.exports = Favorite;
